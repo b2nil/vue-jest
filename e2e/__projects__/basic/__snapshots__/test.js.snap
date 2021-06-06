@@ -6,7 +6,7 @@ exports[`generates source maps for .vue files 1`] = `
 Object.defineProperty(exports, \\"__esModule\\", {
   value: true
 });
-exports[\\"default\\"] = void 0;
+exports.default = void 0;
 var _default = {
   name: 'basic',
   computed: {
@@ -30,7 +30,7 @@ var _default = {
     }
   }
 };
-exports[\\"default\\"] = _default;
+exports.default = _default;
 \\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 exports.render = void 0;
@@ -51,7 +51,7 @@ exports[`generates source maps using src attributes 1`] = `
 Object.defineProperty(exports, \\"__esModule\\", {
   value: true
 });
-exports[\\"default\\"] = void 0;
+exports.default = void 0;
 var _default = {
   name: 'basic',
   computed: {
@@ -75,7 +75,7 @@ var _default = {
     }
   }
 };
-exports[\\"default\\"] = _default;
+exports.default = _default;
 \\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 exports.render = void 0;

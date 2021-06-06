@@ -1,7 +1,11 @@
 <script>
 export default {
   render() {
-    return <div />
+    return (
+      <div>
+        <div id="jsx" />
+      </div>
+    )
   }
 }
 </script>

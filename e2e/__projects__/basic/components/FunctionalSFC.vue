@@ -1,5 +1,12 @@
-<template functional>
-  <div @click="props.onClick(props.msg.id)">
-    {{ props.msg.title }} <slot></slot>
+<template>
+  <div v-bind="$attrs">
+    {{ $props.msg.title }}
+    <slot></slot>
   </div>
 </template>
+
+<script>
+export default {
+  props: ['msg']
+}
+</script>

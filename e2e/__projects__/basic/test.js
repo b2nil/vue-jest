@@ -1,15 +1,15 @@
-import { createApp, h, nextTick } from 'vue'
+import { h } from 'vue'
+import { mount } from '@vue/test-utils'
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
+import { defaults } from 'jest-config'
+import path from 'path'
 
 import BasicSrc from './components/BasicSrc.vue'
 import TsSrc from './components/TsSrc.vue'
 import Pug from './components/Pug.vue'
 import Coffee from './components/Coffee.vue'
 import Basic from './components/Basic.vue'
-// import ClassComponent from './components/ClassComponent.vue'
-// import ClassComponentWithMixin from './components/ClassComponentWithMixin.vue'
-// import ClassComponentProperty from './components/ClassComponentProperty.vue'
 import TypeScript from './components/TypeScript.vue'
 import jestVue from '../../../'
 import RenderFunction from './components/RenderFunction.vue'
@@ -21,169 +21,145 @@ import PugRelative from './components/PugRelativeExtends.vue'
 import { randomExport } from './components/NamedExport.vue'
 import ScriptSetup from './components/ScriptSetup.vue'
 import FunctionalRenderFn from './components/FunctionalRenderFn.vue'
-
-// TODO: JSX for Vue 3? TSX?
 import Jsx from './components/Jsx.vue'
 
-function mount(Component, props, slots) {
-  document.getElementsByTagName('html')[0].innerHTML = ''
-  const el = document.createElement('div')
-  el.id = 'app'
-  document.body.appendChild(el)
-  const Parent = {
-    render() {
-      return h(Component, props, slots)
-    }
+const process = (source, filePath, options) => {
+  const defaultCwd = path.resolve()
+  const config = { ...defaults, ...(options || {}), cwd: defaultCwd }
+
+  const transformer = jestVue.createTransformer({
+    config
+  })
+
+  const output = transformer.process(source, filePath, { config })
+  return {
+    ...output
   }
-  createApp(Parent).mount(el)
 }
 
-test('supports <script setup>', () => {
-  mount(ScriptSetup)
-  expect(document.body.outerHTML).toContain('Count: 5')
-  expect(document.body.outerHTML).toContain('Welcome to Your Vue.js App')
+test('supports <script setup>', async () => {
+  const wrapper = mount(ScriptSetup)
+  expect(wrapper.find('button').text()).toEqual('Count: 5')
+  expect(wrapper.find('span').text()).toEqual('hello world')
+  expect(wrapper.find('.hello h1').text()).toEqual('Welcome to Your Vue.js App')
+
+  const log = jest.spyOn(console, 'log')
+  await wrapper.find('button').trigger('click')
+  expect(wrapper.find('button').text()).toEqual('Count: 6')
+  expect(log.mock.calls[0][0]).toBe('greet')
 })
 
 test('processes .vue files', () => {
-  mount(Basic)
-  expect(document.querySelector('h1').textContent).toBe(
-    'Welcome to Your Vue.js App'
-  )
+  const wrapper = mount(Basic)
+  expect(wrapper.find('h1').text()).toBe('Welcome to Your Vue.js App')
 })
 
 test('processes .vue files with js src attributes', () => {
-  mount(BasicSrc)
-  expect(document.querySelector('h1').textContent).toBe(
-    'Welcome to Your Vue.js App'
-  )
+  const wrapper = mount(BasicSrc)
+  expect(wrapper.find('h1').text()).toBe('Welcome to Your Vue.js App')
 })
 
 test('processes .vue files with ts src attributes', () => {
-  mount(TsSrc)
-  expect(document.querySelector('h1').textContent).toBe(
-    'Welcome to Your Vue.js App'
-  )
+  const wrapper = mount(TsSrc)
+  expect(wrapper.find('h1').text()).toBe('Welcome to Your Vue.js App')
 })
 
 test('handles named exports', () => {
   expect(randomExport).toEqual(42)
 })
 
-test.skip('generates source maps for .vue files', () => {
+test('generates source maps for .vue files', () => {
   const filePath = resolve(__dirname, './components/Basic.vue')
   const fileString = readFileSync(filePath, { encoding: 'utf8' })
-  const { code } = jestVue.process(fileString, filePath, {
+  const { code } = process(fileString, filePath, {
     moduleFileExtensions: ['js', 'vue']
   })
 
-  // expect(code).toMatchSnapshot()
+  expect(code).toMatchSnapshot()
 })
 
-test.skip('generates source maps using src attributes', () => {
+test('generates source maps using src attributes', () => {
   const filePath = resolve(__dirname, './components/SourceMapsSrc.vue')
   const fileString = readFileSync(filePath, { encoding: 'utf8' })
 
-  const { code } = jestVue.process(fileString, filePath, {
+  const { code } = process(fileString, filePath, {
     moduleFileExtensions: ['js', 'vue']
   })
 
-  // expect(code).toMatchSnapshot()
+  expect(code).toMatchSnapshot()
 })
 
 test('processes .vue file with lang set to coffee', () => {
-  mount(Coffee)
-  expect(document.querySelector('h1').textContent).toBe('Coffee')
+  const wrapper = mount(Coffee)
+  expect(wrapper.find('h1').text()).toBe('Coffee')
 })
 
 test('processes .vue file with lang set to coffeescript', () => {
-  mount(CoffeeScript)
-  expect(document.querySelector('h1').textContent).toBe('CoffeeScript')
+  const wrapper = mount(CoffeeScript)
+  expect(wrapper.find('h1').text()).toBe('CoffeeScript')
 })
 
 test('processes SFC with no template', () => {
-  mount(RenderFunction, {}, { default: () => h('div', { id: 'slot' }) })
-  expect(document.querySelector('#slot')).toBeTruthy()
+  const wrapper = mount(RenderFunction, {
+    slots: { default: () => h('div', { id: 'slot' }) }
+  })
+  expect(wrapper.find('#slot').exists()).toBeTruthy()
 })
 
 test('processes .vue files with lang set to typescript', () => {
-  mount(TypeScript)
-  expect(document.querySelector('#parent').textContent).toBe('Parent')
-  expect(document.querySelector('#child').textContent).toBe('Child')
+  const wrapper = mount(TypeScript)
+  expect(wrapper.find('#parent').text()).toBe('Parent')
+  expect(wrapper.find('#child').text()).toBe('Child')
 })
 
 test('handles missing script block', () => {
-  mount(NoScript)
-  expect(document.querySelector('.footer').textContent).toBe("I'm footer!")
+  const wrapper = mount(NoScript)
+  expect(wrapper.find('.footer').text()).toBe("I'm footer!")
 })
 
 test('processes pug templates', () => {
-  mount(Pug)
-  expect(document.querySelector('.pug-base')).toBeTruthy()
-  expect(document.querySelector('.pug-extended')).toBeTruthy()
+  const wrapper = mount(Pug)
+  expect(wrapper.find('.pug-base').exists()).toBeTruthy()
+  expect(wrapper.find('.pug-extended').exists()).toBeTruthy()
 })
 
 test('supports relative paths when extending templates from .pug files', () => {
-  mount(PugRelative)
-  expect(document.querySelector('.pug-relative-base')).toBeTruthy()
+  const wrapper = mount(PugRelative)
+  expect(wrapper.find('.pug-relative-base').exists()).toBeTruthy()
 })
 
-test.skip('supports class component .vue files', () => {
-  expect.assertions(3)
-  mount(ClassComponent, { msg: 'Props Message' })
-  expect(document.querySelector('[data-computed]').textContent).toBe(
-    'Message: Props Message'
-  )
-  expect(document.querySelector('[data-props]').textContent).toBe(
-    'Props Message'
-  )
-  const event = new window.Event('click')
-  document.querySelector('button').dispatchEvent(event)
-  nextTick().then(() => {
-    expect(document.querySelector('[data-methods]').textContent).toBe('Updated')
+test('processes functional components', async () => {
+  const mockFn = jest.fn()
+  const wrapper = mount(FunctionalSFC, {
+    props: {
+      msg: {
+        id: 1,
+        title: 'foo'
+      },
+      onClick: mockFn
+    }
   })
+
+  const el = wrapper.find('div')
+  el.trigger('click')
+  expect(el.text()).toBe('foo')
+  expect(mockFn).toBeCalled()
 })
 
-test.skip('supports class component .vue files with mixins', () => {
-  expect.assertions(1)
-  mount(ClassComponentWithMixin)
-  expect(document.querySelector('[data-mixin]').textContent).toBe(
-    'Hello world!'
-  )
+test('processes SFC with functional template from parent', () => {
+  const wrapper = mount(FunctionalSFCParent)
+  expect(wrapper.find('div').text()).toBe('foo')
 })
 
-test.skip('supports class component .vue files using vue-property-decorator', () => {
-  expect.assertions(2)
-  mount(ClassComponentProperty, { msg: 'Props Message' })
-  expect(document.querySelector('[data-computed]').textContent).toBe(
-    'Message: Hello'
-  )
-  expect(document.querySelector('[data-props]').textContent).toBe(
-    'Props Message'
-  )
-})
-
-// TODO: How do functional components work in Vue 3?
-xtest('processes functional components', () => {
-  // const clickSpy = jest.fn()
-  mount(FunctionalSFC)
-})
-
-// TODO: How do functional components work in Vue 3?
-xtest('processes SFC with functional template from parent', () => {
-  mount(FunctionalSFCParent)
-  expect(document.querySelector('div').textContent).toBe('foo')
-})
-
-// TODO: JSX in Vue 3?
-xtest('processes .vue file using jsx', () => {
-  mount(Jsx)
-  expect(document.querySelector('#jsx')).toBeTruthy()
+test('processes .vue file using jsx', () => {
+  const wrapper = mount(Jsx)
+  expect(wrapper.find('#jsx').exists()).toBeTruthy()
 })
 
 test('processes functional component exported as function', () => {
-  mount(FunctionalRenderFn)
+  const wrapper = mount(FunctionalRenderFn)
 
-  const elem = document.querySelector('#functional-render-fn')
-  expect(elem).toBeTruthy()
-  expect(elem.innerHTML).toBe('Nyan')
+  const elem = wrapper.find('#functional-render-fn')
+  expect(elem.exists()).toBeTruthy()
+  expect(elem.text()).toBe('Nyan')
 })
