@@ -4,13 +4,13 @@ const fs = require('fs-extra')
 const chalk = require('chalk')
 
 const IGNORE_FILES = [
-  '.DS_Store',
-  'babel-in-package',
-  'basic',
+  '.DS_Store'
+  // 'babel-in-package',
+  // 'basic',
   // "custom-transformers",
-  'style',
-  'javascript',
-  'typescript'
+  // 'style',
+  // 'javascript',
+  // 'typescript'
 ]
 const cwd = process.cwd()
 
