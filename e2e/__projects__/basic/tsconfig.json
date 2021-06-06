@@ -15,6 +15,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "allowJs": true
+    "allowJs": true,
+    "jsx": "preserve"
   }
 }

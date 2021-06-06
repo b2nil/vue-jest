@@ -3,7 +3,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import FunctionalSFC from './FunctionalSFC'
 
 export default {

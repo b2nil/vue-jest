@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should honor sfc template compile options provided in globals 1`] = `
+<div>
+  <view
+    class="light"
+  >
+    should be treated as native tag
+  </view>
+  <div
+    class="comp"
+  >
+    
+    should resolve this tag as component
+    
+  </div>
+  <scroll-view
+    class="dark"
+  >
+    should be treated as native tag
+  </scroll-view>
+  <unknown-tag
+    class="unkown"
+  >
+    should fail to resolve this tag 
+  </unknown-tag>
+</div>
+`;

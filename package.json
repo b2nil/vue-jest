@@ -23,7 +23,7 @@
     "lint": "eslint --ignore-path .gitignore '{,!(node_modules)/**/}*.js'",
     "lint:fix": "yarn lint --fix",
     "release": "semantic-release",
-    "test": "yarn lint && yarn format:check && yarn test:e2e",
+    "test": "yarn test:e2e",
     "test:e2e": "node e2e/test-runner"
   },
   "author": "Edd Yerburgh",
@@ -32,8 +32,7 @@
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
     "@vue/compiler-sfc": "^3.0.3",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^26.0.0",
+    "babel-jest": "^27.0.0",
     "coffeescript": "^2.3.2",
     "conventional-changelog": "^1.1.5",
     "eslint": "^5.12.0",
@@ -48,7 +47,7 @@
     "hamljs": "^0.6.2",
     "husky": "^1.1.4",
     "jade": "^1.11.0",
-    "jest": "^26.0.0",
+    "jest": "^27.0.0",
     "less": "^3.9.0",
     "lint-staged": "^8.0.5",
     "prettier": "^1.16.1",
@@ -56,17 +55,17 @@
     "sass": "^1.23.7",
     "semantic-release": "^15.13.2",
     "stylus": "^0.54.5",
-    "ts-jest": "^26.4.4",
+    "ts-jest": "^27.0.0",
     "typescript": "^4.1.2",
     "vue": "^3.0.3"
   },
   "peerDependencies": {
     "@babel/core": "7.x",
-    "babel-jest": ">= 24 < 27",
-    "jest": ">= 24 < 27 ",
-    "ts-jest": ">= 24 < 27 ",
-    "typescript": ">= 3.x",
-    "vue": "^3.0.0-0"
+    "babel-jest": ">= 27",
+    "jest": ">= 27 ",
+    "ts-jest": ">= 27 ",
+    "typescript": ">= 4.x",
+    "vue": "^3.0.0"
   },
   "peerDependenciesMeta": {
     "ts-jest": {

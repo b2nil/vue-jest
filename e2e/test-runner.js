@@ -3,7 +3,15 @@ const path = require('path')
 const fs = require('fs-extra')
 const chalk = require('chalk')
 
-const IGNORE_FILES = ['.DS_Store']
+const IGNORE_FILES = [
+  '.DS_Store',
+  'babel-in-package',
+  'basic',
+  // "custom-transformers",
+  'style',
+  'javascript',
+  'typescript'
+]
 const cwd = process.cwd()
 
 // Can be run as `yarn test:e2e --cache` to forego reinstalling node_modules, or
